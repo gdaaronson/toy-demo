@@ -80,6 +80,45 @@ Each row gets an auto-incrementing `BIGINT` primary key (`id`) in the database. 
 
 **Validation error:** `400 Bad Request` with field-level errors.
 
+### Get transaction with currency conversion
+
+`GET /api/transactions/{uniqueIdentifier}?currency=<treasury-currency-code>`
+
+The stored **transaction date** on the record is used together with `currency` when calling the Treasury [rates of exchange](https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange) API. Query parameters sent to Treasury: `fields=country_currency_desc,exchange_rate,record_date` and  
+
+`filter=country_currency_desc:eq:<currency>,record_date:gte:<transaction_date minus 6 months>`.
+
+| Query | Rules |
+|-------|--------|
+| `currency` | Required. Must match Treasury `country_currency_desc` (for example `Canada-Dollar`, `Euro-Zone-Euro`). |
+
+| Outcome | HTTP |
+|---------|------|
+| Unknown `uniqueIdentifier` | `404 Not Found` |
+| No exchange rates in that 6‑month window | `404 Not Found` — message explains no data in the window |
+| Success | `200 OK` |
+
+**Success response:**
+
+```json
+{
+  "uniqueIdentifier": "txn-001",
+  "description": "Coffee",
+  "transactionDate": "2026-05-14",
+  "purchaseAmount": 10.00,
+  "exchangeRate": 1.393,
+  "convertedAmount": 13.93
+}
+```
+
+`exchangeRate` is the Treasury rate for the `record_date` **closest** (by calendar days) to the stored transaction date among rates returned in the window. `convertedAmount` is `purchaseAmount * exchangeRate`, rounded to **2** decimal places (half-up).
+
+Configurable base URL (default is the live Treasury API):
+
+```properties
+treasury.api.base-url=https://api.fiscaldata.treasury.gov/services/api/fiscal_service/
+```
+
 ### Example requests
 
 Use a `transactionDate` of today or earlier (`yyyy-MM-dd`).

@@ -6,9 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.util.List;
 
@@ -46,6 +48,41 @@ public class GlobalExceptionHandler {
                 "validation failed",
                 List.of(new ErrorResponse.FieldError("uniqueIdentifier", ex.getMessage()))
         );
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMissingRequestParameter(MissingServletRequestParameterException ex) {
+        return new ErrorResponse(
+                "validation failed",
+                List.of(new ErrorResponse.FieldError(ex.getParameterName(), ex.getParameterName() + " is required")));
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMethodValidation(HandlerMethodValidationException ex) {
+        List<ErrorResponse.FieldError> errors = ex.getParameterValidationResults().stream()
+                .flatMap(result -> result.getResolvableErrors().stream()
+                        .map(error -> new ErrorResponse.FieldError(
+                                result.getMethodParameter().getParameterName(),
+                                error.getDefaultMessage())))
+                .toList();
+        return new ErrorResponse("validation failed", errors);
+    }
+
+    @ExceptionHandler(TransactionNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleTransactionNotFound(TransactionNotFoundException ex) {
+        return new ErrorResponse(
+                ex.getMessage(),
+                List.of(new ErrorResponse.FieldError("uniqueIdentifier", ex.getMessage()))
+        );
+    }
+
+    @ExceptionHandler(NoExchangeRateDataException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleNoExchangeRateData(NoExchangeRateDataException ex) {
+        return new ErrorResponse(ex.getMessage(), List.of());
     }
 
     private ErrorResponse.FieldError toFieldError(FieldError fieldError) {

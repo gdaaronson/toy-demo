@@ -3,7 +3,7 @@ package com.toydemo.transaction.validation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-import com.toydemo.transaction.PurchaseUtils;
+import com.toydemo.transaction.TransactionUtils;
 
 import java.math.BigDecimal;
 
@@ -14,6 +14,6 @@ public class AmountInCentsValidator implements ConstraintValidator<AmountInCents
         if (value == null) {
             return true;
         }
-        return PurchaseUtils.roundToCents(value).compareTo(BigDecimal.ZERO) > 0;
+        return TransactionUtils.roundToCents(value).compareTo(BigDecimal.ZERO) > 0;
     }
 }
