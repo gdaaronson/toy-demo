@@ -2,6 +2,7 @@ package com.toydemo.transaction;
 
 import com.toydemo.transaction.client.TreasuryExchangeRateRecord;
 import org.junit.jupiter.api.Test;
+import com.toydemo.transaction.exception.NoExchangeRateDataException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TransactionUtilsTest {
 
@@ -45,5 +47,11 @@ class TransactionUtilsTest {
         );
 
         assertNull(TransactionUtils.findClosestExchangeRateToTransactionDate(transactionDate, rates));
+    }
+
+    @Test
+    void parseExchangeRate_invalidString_throwsNoExchangeRateDataException() {
+        String invalid = "not-a-number";
+        assertThrows(NoExchangeRateDataException.class, () -> TransactionUtils.parseExchangeRate(invalid));
     }
 }

@@ -1,6 +1,7 @@
 package com.toydemo.transaction;
 
 import com.toydemo.transaction.client.TreasuryExchangeRateRecord;
+import com.toydemo.transaction.exception.NoExchangeRateDataException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -32,6 +33,10 @@ public final class TransactionUtils {
     }
 
     public static BigDecimal parseExchangeRate(String exchangeRate) {
-        return new BigDecimal(exchangeRate);
+        try {
+            return new BigDecimal(exchangeRate);
+        } catch (NumberFormatException ex) {
+            throw new NoExchangeRateDataException("invalid exchange rate format", ex);
+        }
     }
 }
