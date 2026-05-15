@@ -85,6 +85,12 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(ex.getMessage(), List.of());
     }
 
+    @ExceptionHandler(TreasuryApiUnavailableException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ErrorResponse handleTreasuryUnavailable(TreasuryApiUnavailableException ex) {
+        return new ErrorResponse(ex.getMessage(), List.of());
+    }
+
     private ErrorResponse.FieldError toFieldError(FieldError fieldError) {
         return new ErrorResponse.FieldError(fieldError.getField(), fieldError.getDefaultMessage());
     }

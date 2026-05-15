@@ -229,6 +229,20 @@ class TransactionControllerTest {
     }
 
     @Test
+    void returnsServiceUnavailableWhenTreasuryApiFails() throws Exception {
+        LocalDate transactionDate = LocalDate.of(2025, 8, 15);
+        createTransaction("txn-api-fail", transactionDate, 10.00);
+
+        when(treasuryExchangeRateClient.fetchRates(eq("Canada-Dollar"), eq(transactionDate.minusMonths(6))))
+                .thenThrow(new com.toydemo.transaction.exception.TreasuryApiUnavailableException());
+
+        mockMvc.perform(get("/api/transactions/txn-api-fail")
+                        .param("currency", "Canada-Dollar"))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.message").value("treasury api unavailable"));
+    }
+
+    @Test
     void rejectsMissingCurrencyParameter() throws Exception {
         mockMvc.perform(get("/api/transactions/txn-001"))
                 .andExpect(status().isBadRequest());

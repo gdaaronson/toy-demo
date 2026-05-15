@@ -2,6 +2,7 @@ package com.toydemo.transaction.client;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import com.toydemo.transaction.exception.TreasuryApiUnavailableException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,19 +21,23 @@ public class TreasuryExchangeRateClient {
     public List<TreasuryExchangeRateRecord> fetchRates(String currency, LocalDate windowStart) {
         String filter = "country_currency_desc:eq:%s,record_date:gte:%s".formatted(currency, windowStart);
 
-        TreasuryApiResponse response = restClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(RATES_PATH)
-                        .queryParam("fields", "country_currency_desc,exchange_rate,record_date")
-                        .queryParam("filter", filter)
-                        .queryParam("page[size]", "100")
-                        .build())
-                .retrieve()
-                .body(TreasuryApiResponse.class);
+        try {
+            TreasuryApiResponse response = restClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(RATES_PATH)
+                            .queryParam("fields", "country_currency_desc,exchange_rate,record_date")
+                            .queryParam("filter", filter)
+                            .queryParam("page[size]", "100")
+                            .build())
+                    .retrieve()
+                    .body(TreasuryApiResponse.class);
 
-        if (response == null || response.data() == null) {
-            return List.of();
+            if (response == null || response.data() == null) {
+                return List.of();
+            }
+            return response.data();
+        } catch (RuntimeException ex) {
+            throw new TreasuryApiUnavailableException("treasury api unavailable", ex);
         }
-        return response.data();
     }
 }
