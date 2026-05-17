@@ -4,8 +4,12 @@ Simple Spring Boot REST API with an embedded H2 database.
 
 ## Prerequisites
 
+**Option 1: Local development**
 - **Java 17** or newer (`java -version`)
 - **Apache Maven** (`mvn -version`)
+
+**Option 2: Docker only**
+- **Docker** — run and test the app without Java or Maven installed locally
 
 ## Start the app (CLI)
 
@@ -34,6 +38,71 @@ Run a single test class:
 ```powershell
 mvn test -Dtest=TransactionControllerTest
 ```
+
+Run tests with Docker
+
+You can run Maven tests inside a container **without having Java or Maven installed locally** — only Docker is required. The examples mount your project and cache dependencies in `~/.m2` so subsequent runs are faster.
+
+Bash / macOS / Linux
+
+```bash
+docker run --rm -v ".":/workspace -v ~/.m2:/root/.m2 -w /workspace  maven:3.9.9-eclipse-temurin-17 mvn -B test
+```
+
+PowerShell
+
+```powershell
+docker run --rm `
+  -v "${PWD}:/workspace" `
+  -v "${env:USERPROFILE}\.m2:/root/.m2" `
+  -w /workspace `
+  maven:3.9.9-eclipse-temurin-17 `
+  mvn -B test
+```
+
+CMD
+
+```cmd
+docker run --rm -v "%cd%":/workspace -v "%USERPROFILE%\.m2":/root/.m2 -w /workspace maven:3.9.9-eclipse-temurin-17 mvn -B test
+```
+
+Notes: test reports and the `target/` directory are written into your project folder (because the project is mounted into the container). Omit the `~/.m2` mount if you don't want to cache dependencies.
+
+## Run with Docker
+
+Build the image from the project root:
+
+```powershell
+docker build -t toy-demo .
+```
+
+Run the app with the H2 data directory mounted so the database files persist:
+
+```powershell
+docker run --rm -p 8080:8080 -v "${PWD}/data:/app/data" toy-demo
+```
+
+On Windows PowerShell, use this form if the first command does not work:
+
+```powershell
+docker run --rm -p 8080:8080 -v "${PWD}\\data:/app/data" toy-demo
+```
+
+Bash / macOS / Linux (use `.` for the current directory):
+
+```bash
+docker run --rm -p 8080:8080 -v ./data:/app/data toy-demo
+```
+
+Alternatively (explicit path):
+
+```bash
+docker run --rm -p 8080:8080 -v "$(pwd)/data:/app/data" toy-demo
+```
+
+The app will be available on **http://localhost:8080**.
+
+If you change `src/main/resources/application.properties`, rebuild the image before running it again.
 
 ## API
 
@@ -176,6 +245,20 @@ The app uses a file-backed H2 database by default so data persists across restar
 | Password | *(leave empty)* |
 
 If you prefer a transient in-memory database for quick testing, change the JDBC URL to `jdbc:h2:mem:toydemo` in `application.properties`. The file-backed database is useful when you want records to survive application restarts.
+
+If you run the app with Docker, mount the host `./data` directory into the container at `/app/data` so the file-backed H2 storage is preserved:
+
+```powershell
+docker run --rm -p 8080:8080 -v "${PWD}/data:/app/data" toy-demo
+```
+
+H2 web console (Docker)
+
+If you run the app in Docker you can open the H2 console at `http://localhost:8080/h2-console`.
+Two important notes:
+
+- The app sets `spring.h2.console.settings.web-allow-others=true` so the console accepts remote browser connections when running inside a container.
+- If you mount the host `./data` directory into `/app/data`, use the JDBC URL `jdbc:h2:file:./data/toydemo;DB_CLOSE_DELAY=-1`, user `sa`, and empty password in the console.
 
 ### Option 1: Web console
 
