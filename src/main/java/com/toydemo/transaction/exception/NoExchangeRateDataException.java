@@ -1,9 +1,10 @@
 package com.toydemo.transaction.exception;
 
+import java.time.LocalDate;
 public class NoExchangeRateDataException extends RuntimeException {
 
-    public NoExchangeRateDataException() {
-        super("no exchange rate data exists within a 6 month window");
+    public NoExchangeRateDataException(LocalDate windowStart, LocalDate transactionDate) {
+        super("no exchange rate data exists between " + windowStart + " and " + transactionDate);
     }
 
     public NoExchangeRateDataException(String message, Throwable cause) {

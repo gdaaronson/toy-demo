@@ -26,10 +26,13 @@ public final class TransactionUtils {
         LocalDate windowStart = transactionDate.minusMonths(6);
 
         return rates.stream()
-                .filter(rate -> !rate.recordDate().isBefore(windowStart))
-                .min(Comparator.comparingLong(rate ->
-                        Math.abs(ChronoUnit.DAYS.between(transactionDate, rate.recordDate()))))
-                .orElse(null);
+            .filter(rate -> {
+                java.time.LocalDate rd = rate.recordDate();
+                return !rd.isBefore(windowStart) && !rd.isAfter(transactionDate);
+            })
+            .min(Comparator.comparingLong(rate ->
+                Math.abs(ChronoUnit.DAYS.between(transactionDate, rate.recordDate()))))
+            .orElse(null);
     }
 
     public static BigDecimal parseExchangeRate(String exchangeRate) {

@@ -57,7 +57,7 @@ public class TransactionService {
                 TransactionUtils.findClosestExchangeRateToTransactionDate(transactionDate, rates);
 
         if (closest == null) {
-            throw new NoExchangeRateDataException();
+            throw new NoExchangeRateDataException(windowStart, transactionDate);
         }
 
         BigDecimal exchangeRate = TransactionUtils.parseExchangeRate(closest.exchangeRate());
