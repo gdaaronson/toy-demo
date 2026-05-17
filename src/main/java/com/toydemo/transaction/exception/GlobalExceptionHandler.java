@@ -91,6 +91,12 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(ex.getMessage(), List.of());
     }
 
+    @ExceptionHandler(DescriptionTooLongException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleDescriptionTooLong(com.toydemo.transaction.exception.DescriptionTooLongException ex) {
+        return new ErrorResponse("validation failed", List.of(new ErrorResponse.FieldError("description", ex.getMessage())));
+    }
+
     private ErrorResponse.FieldError toFieldError(FieldError fieldError) {
         return new ErrorResponse.FieldError(fieldError.getField(), fieldError.getDefaultMessage());
     }

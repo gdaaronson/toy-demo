@@ -6,7 +6,6 @@ import com.toydemo.transaction.validation.AmountInCents;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,7 +13,6 @@ import java.time.LocalDate;
 public class CreateTransactionRequest {
 
     @NotBlank(message = "description is required")
-    @Size(max = 50, message = "description must be at most 50 characters")
     private String description;
 
     @NotNull(message = "transaction date is required")
