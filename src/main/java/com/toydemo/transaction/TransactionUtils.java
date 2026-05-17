@@ -21,14 +21,14 @@ public final class TransactionUtils {
 
     public static TreasuryExchangeRateRecord findClosestExchangeRateToTransactionDate(
             LocalDate transactionDate,
-            LocalDate windowStart,
+            LocalDate startWindow,
             List<TreasuryExchangeRateRecord> rates
     ) {
 
         return rates.stream()
             .filter(rate -> {
                 java.time.LocalDate rd = rate.recordDate();
-                return !rd.isBefore(windowStart) && !rd.isAfter(transactionDate);
+                return !rd.isBefore(startWindow) && !rd.isAfter(transactionDate);
             })
             .min(Comparator.comparingLong(rate ->
                 Math.abs(ChronoUnit.DAYS.between(transactionDate, rate.recordDate()))))

@@ -18,8 +18,8 @@ public class TreasuryExchangeRateClient {
         this.restClient = treasuryRestClient;
     }
 
-    public List<TreasuryExchangeRateRecord> fetchRates(String currency, LocalDate windowStart) {
-        String filter = "country_currency_desc:eq:%s,record_date:gte:%s".formatted(currency, windowStart);
+    public List<TreasuryExchangeRateRecord> fetchRates(String currency, LocalDate startWindow) {
+        String filter = "country_currency_desc:eq:%s,record_date:gte:%s".formatted(currency, startWindow);
 
         try {
             TreasuryApiResponse response = restClient.get()

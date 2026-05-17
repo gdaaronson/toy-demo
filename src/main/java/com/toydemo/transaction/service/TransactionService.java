@@ -50,14 +50,14 @@ public class TransactionService {
                 .orElseThrow(() -> new TransactionNotFoundException(uniqueIdentifier));
 
         LocalDate transactionDate = transaction.getTransactionDate();
-        LocalDate windowStart = transactionDate.minusMonths(6);
+        LocalDate startWindow = transactionDate.minusMonths(6);
 
-        List<TreasuryExchangeRateRecord> rates = treasuryClient.fetchRates(currency, windowStart);
+        List<TreasuryExchangeRateRecord> rates = treasuryClient.fetchRates(currency, startWindow);
         TreasuryExchangeRateRecord closest =
-                TransactionUtils.findClosestExchangeRateToTransactionDate(transactionDate, windowStart, rates);
+                TransactionUtils.findClosestExchangeRateToTransactionDate(transactionDate, startWindow, rates);
 
         if (closest == null) {
-            throw new NoExchangeRateDataException(windowStart, transactionDate);
+            throw new NoExchangeRateDataException(startWindow, transactionDate);
         }
 
         BigDecimal exchangeRate = TransactionUtils.parseExchangeRate(closest.exchangeRate());
