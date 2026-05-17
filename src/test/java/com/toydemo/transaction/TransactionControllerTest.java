@@ -93,7 +93,7 @@ class TransactionControllerTest {
                         .content(body))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors[0].field").value("uniqueIdentifier"))
-                .andExpect(jsonPath("$.errors[0].message").value("unique identifier must be 100 characters or fewer"));
+                .andExpect(jsonPath("$.errors[0].message").value("unique identifier is too long: 101 characters (max 100)"));
     }
 
     @Test
