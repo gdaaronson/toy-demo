@@ -55,7 +55,7 @@ mvn test -Dtest=TransactionControllerTest
 | `description` | Required, max 50 characters |
 | `transactionDate` | `yyyy-MM-dd`, today or earlier (not in the future) |
 | `purchaseAmount` | Positive; rounded to nearest cent on save (half-up, e.g. `10.005` → `10.01`) |
-| `uniqueIdentifier` | Required, must be unique |
+| `uniqueIdentifier` | Required, unique, max 100 characters |
 
 **Success:** `201 Created` with the saved record.
 
@@ -165,7 +165,7 @@ curl.exe -X POST http://localhost:8080/api/transactions -H "Content-Type: applic
 
 ## H2 database access (optional)
 
-The app now uses a file-backed H2 database by default so data persists across restarts. Database files are stored in the project `./data` directory (relative to the project root).
+The app uses a file-backed H2 database by default so data persists across restarts. Database files are stored in the project `./data` directory (relative to the project root).
 
 **Default connection settings** (configured in `src/main/resources/application.properties`):
 

@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -23,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestPropertySource(properties = "spring.datasource.url=jdbc:h2:mem:toydemo;DB_CLOSE_DELAY=-1")
 class TransactionControllerTest {
 
     @Autowired
@@ -72,6 +74,26 @@ class TransactionControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", hasSize(1)))
                 .andExpect(jsonPath("$.errors[0].field").value("uniqueIdentifier"));
+    }
+
+    @Test
+    void rejectsUniqueIdentifierTooLong() throws Exception {
+        String longIdentifier = "x".repeat(101);
+        String body = """
+                {
+                  "description": "Coffee",
+                  "transactionDate": "%s",
+                  "purchaseAmount": 4.50,
+                  "uniqueIdentifier": "%s"
+                }
+                """.formatted(LocalDate.now().minusDays(1), longIdentifier);
+
+        mockMvc.perform(post("/api/transactions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0].field").value("uniqueIdentifier"))
+                .andExpect(jsonPath("$.errors[0].message").value("unique identifier must be 100 characters or fewer"));
     }
 
     @Test

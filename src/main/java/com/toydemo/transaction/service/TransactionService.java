@@ -8,7 +8,7 @@ import com.toydemo.transaction.client.TreasuryExchangeRateRecord;
 import com.toydemo.transaction.dto.CreateTransactionRequest;
 import com.toydemo.transaction.dto.TransactionConversionResponse;
 import com.toydemo.transaction.dto.TransactionResponse;
-import com.toydemo.transaction.exception.DescriptionTooLongException;
+import com.toydemo.transaction.exception.ParameterTooLongException;
 import com.toydemo.transaction.exception.DuplicateUniqueIdentifierException;
 import com.toydemo.transaction.exception.NoExchangeRateDataException;
 import com.toydemo.transaction.exception.TransactionNotFoundException;
@@ -33,7 +33,10 @@ public class TransactionService {
     @Transactional
     public TransactionResponse create(CreateTransactionRequest request) {
         if (request.getDescription() != null && request.getDescription().length() > 50) {
-            throw new DescriptionTooLongException(request.getDescription().length(), 50);
+            throw new ParameterTooLongException(request.getDescription().length(), 50, "description");
+        }
+        if (request.getUniqueIdentifier() != null && request.getUniqueIdentifier().length() > 100) {
+            throw new ParameterTooLongException(request.getUniqueIdentifier().length(), 100, "unique identifier");
         }
         if (repository.existsByUniqueIdentifier(request.getUniqueIdentifier())) {
             throw new DuplicateUniqueIdentifierException(request.getUniqueIdentifier());

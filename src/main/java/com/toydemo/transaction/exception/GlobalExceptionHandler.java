@@ -2,6 +2,7 @@ package com.toydemo.transaction.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.toydemo.transaction.dto.ErrorResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -91,10 +92,12 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(ex.getMessage(), List.of());
     }
 
-    @ExceptionHandler(DescriptionTooLongException.class)
+    @ExceptionHandler(ParameterTooLongException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleDescriptionTooLong(com.toydemo.transaction.exception.DescriptionTooLongException ex) {
-        return new ErrorResponse("validation failed", List.of(new ErrorResponse.FieldError("description", ex.getMessage())));
+    public ErrorResponse handleParameterTooLong(ParameterTooLongException ex) {
+        return new ErrorResponse("validation failed", List.of(
+                new ErrorResponse.FieldError(ex.getFieldName(), ex.getMessage())
+        ));
     }
 
     private ErrorResponse.FieldError toFieldError(FieldError fieldError) {
