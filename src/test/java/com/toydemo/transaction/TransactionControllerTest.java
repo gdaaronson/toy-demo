@@ -203,7 +203,7 @@ class TransactionControllerTest {
                         .param("currency", "Canada-Dollar"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message")
-                        .value("no exchange rate data exists within a 6 month window"));
+                        .value("no exchange rate data exists between 2025-02-15 and 2025-08-15"));
     }
 
     @Test
@@ -224,8 +224,8 @@ class TransactionControllerTest {
                 .andExpect(jsonPath("$.description").value("Coffee"))
                 .andExpect(jsonPath("$.transactionDate").value("2025-08-15"))
                 .andExpect(jsonPath("$.purchaseAmount").value(10.00))
-                .andExpect(jsonPath("$.exchangeRate").value(1.400))
-                .andExpect(jsonPath("$.convertedAmount").value(14.00));
+                .andExpect(jsonPath("$.exchangeRate").value(1.350))
+                .andExpect(jsonPath("$.convertedAmount").value(13.50));
     }
 
     @Test

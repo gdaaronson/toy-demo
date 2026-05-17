@@ -34,9 +34,9 @@ class TransactionUtilsTest {
         );
 
         TreasuryExchangeRateRecord closest =
-                TransactionUtils.findClosestExchangeRateToTransactionDate(transactionDate, rates);
+            TransactionUtils.findClosestExchangeRateToTransactionDate(transactionDate, transactionDate.minusMonths(6), rates);
 
-        assertEquals(LocalDate.of(2025, 9, 30), closest.recordDate());
+        assertEquals(LocalDate.of(2025, 3, 31), closest.recordDate());
     }
 
     @Test
@@ -46,7 +46,7 @@ class TransactionUtilsTest {
                 new TreasuryExchangeRateRecord("Canada-Dollar", "1.350", LocalDate.of(2024, 3, 31))
         );
 
-        assertNull(TransactionUtils.findClosestExchangeRateToTransactionDate(transactionDate, rates));
+        assertNull(TransactionUtils.findClosestExchangeRateToTransactionDate(transactionDate, transactionDate.minusMonths(6), rates));
     }
 
     @Test

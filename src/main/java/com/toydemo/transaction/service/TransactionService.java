@@ -54,7 +54,7 @@ public class TransactionService {
 
         List<TreasuryExchangeRateRecord> rates = treasuryClient.fetchRates(currency, windowStart);
         TreasuryExchangeRateRecord closest =
-                TransactionUtils.findClosestExchangeRateToTransactionDate(transactionDate, rates);
+                TransactionUtils.findClosestExchangeRateToTransactionDate(transactionDate, windowStart, rates);
 
         if (closest == null) {
             throw new NoExchangeRateDataException(windowStart, transactionDate);

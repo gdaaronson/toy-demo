@@ -21,9 +21,9 @@ public final class TransactionUtils {
 
     public static TreasuryExchangeRateRecord findClosestExchangeRateToTransactionDate(
             LocalDate transactionDate,
+            LocalDate windowStart,
             List<TreasuryExchangeRateRecord> rates
     ) {
-        LocalDate windowStart = transactionDate.minusMonths(6);
 
         return rates.stream()
             .filter(rate -> {
