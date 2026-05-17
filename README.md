@@ -90,7 +90,7 @@ The stored **transaction date** on the record is used together with `currency` w
 
 | Query | Rules |
 |-------|--------|
-| `currency` | Required. Must match Treasury `country_currency_desc` (for example `Canada-Dollar`, `Euro-Zone-Euro`). |
+| `currency` | Required. Must match Treasury `country_currency_desc` (for example `Canada-Dollar`, `Euro Zone-Euro`). |
 
 | Outcome | HTTP |
 |---------|------|
