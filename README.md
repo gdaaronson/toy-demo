@@ -165,17 +165,17 @@ curl.exe -X POST http://localhost:8080/api/transactions -H "Content-Type: applic
 
 ## H2 database access (optional)
 
-The app uses an **in-memory** database. It only exists while `mvn spring-boot:run` is running.
+The app now uses a file-backed H2 database by default so data persists across restarts. Database files are stored in the project `./data` directory (relative to the project root).
 
-**Connection settings** (use for either option below):
+**Default connection settings** (configured in `src/main/resources/application.properties`):
 
 | Setting | Value |
 |---------|--------|
-| JDBC URL | `jdbc:h2:mem:toydemo` |
+| JDBC URL | `jdbc:h2:file:./data/toydemo;DB_CLOSE_DELAY=-1` |
 | User Name | `sa` |
 | Password | *(leave empty)* |
 
-Do **not** use a file path such as `jdbc:h2:C:/Users/.../test` — that looks for a database file on disk and will fail with “Database not found”.
+If you prefer a transient in-memory database for quick testing, change the JDBC URL to `jdbc:h2:mem:toydemo` in `application.properties`. The file-backed database is useful when you want records to survive application restarts.
 
 ### Option 1: Web console
 
@@ -187,10 +187,10 @@ Do **not** use a file path such as `jdbc:h2:C:/Users/.../test` — that looks fo
 
 1. Start the app (`mvn spring-boot:run`).
 2. In your IDE (IntelliJ, etc.), add an H2 data source:
-   - **URL:** `jdbc:h2:mem:toydemo`
-   - **User:** `sa`
-   - **Password:** *(empty)*
-   - **Driver:** H2 (`com.h2database:h2` from Maven)
+  - **URL:** `jdbc:h2:file:./data/toydemo;DB_CLOSE_DELAY=-1`
+  - **User:** `sa`
+  - **Password:** *(empty)*
+  - **Driver:** H2 (`com.h2database:h2` from Maven)
 3. Run **Test Connection**.
 
-**Note:** In-memory H2 is tied to the JVM that started the app. Some IDE tools use a separate JVM and may show an empty database even with the correct URL. If that happens, try the web console (Option 1), which connects through the running app.
+**Note:** Because the database is file-backed, the same `./data` files will be reused across restarts. If you need a clean slate, stop the app and remove the files under `./data`.
