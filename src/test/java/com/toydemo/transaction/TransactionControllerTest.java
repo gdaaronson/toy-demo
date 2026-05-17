@@ -203,7 +203,7 @@ class TransactionControllerTest {
                         .param("currency", "Canada-Dollar"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message")
-                        .value("no exchange rate data exists between 2025-02-15 and 2025-08-15"));
+                        .value("no exchange rate data found for currency Canada-Dollar"));
     }
 
     @Test

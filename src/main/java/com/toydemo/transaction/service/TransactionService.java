@@ -52,12 +52,16 @@ public class TransactionService {
         LocalDate transactionDate = transaction.getTransactionDate();
         LocalDate startWindow = transactionDate.minusMonths(6);
 
-        List<TreasuryExchangeRateRecord> rates = treasuryClient.fetchRates(currency, startWindow);
+        List<TreasuryExchangeRateRecord> ratesResponse = treasuryClient.fetchRates(currency, startWindow);
+        if (ratesResponse.isEmpty()) {
+            throw new NoExchangeRateDataException(currency);
+        }
+
         TreasuryExchangeRateRecord closest =
-                TransactionUtils.findClosestExchangeRateToTransactionDate(transactionDate, startWindow, rates);
+                TransactionUtils.findClosestExchangeRateToTransactionDate(transactionDate, startWindow, ratesResponse);
 
         if (closest == null) {
-            throw new NoExchangeRateDataException(startWindow, transactionDate);
+            throw new NoExchangeRateDataException(startWindow, transactionDate, currency);
         }
 
         BigDecimal exchangeRate = TransactionUtils.parseExchangeRate(closest.exchangeRate());
