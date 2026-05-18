@@ -4,6 +4,7 @@ import com.toydemo.transaction.dto.CreateTransactionRequest;
 import com.toydemo.transaction.dto.TransactionConversionResponse;
 import com.toydemo.transaction.dto.TransactionResponse;
 import com.toydemo.transaction.service.TransactionService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
@@ -30,15 +31,28 @@ public class TransactionController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TransactionResponse create(@Valid @RequestBody CreateTransactionRequest request) {
-        return service.create(request);
+    public TransactionResponse create(@Valid @RequestBody CreateTransactionRequest request,
+                                      HttpServletRequest servletRequest) {
+        return service.create(request,
+                buildRequestUrl(servletRequest),
+                servletRequest.getRequestURI());
     }
 
     @GetMapping("/{uniqueIdentifier}")
     public TransactionConversionResponse getConversion(
             @PathVariable String uniqueIdentifier,
-            @RequestParam @NotBlank(message = "currency is required") String currency
+            @RequestParam @NotBlank(message = "currency is required") String currency,
+            HttpServletRequest servletRequest
     ) {
-        return service.getConversion(uniqueIdentifier, currency);
+        return service.getConversion(uniqueIdentifier,
+                currency,
+                buildRequestUrl(servletRequest),
+                servletRequest.getRequestURI());
+    }
+
+    private String buildRequestUrl(HttpServletRequest request) {
+        String url = request.getRequestURL().toString();
+        String queryString = request.getQueryString();
+        return queryString == null ? url : url + "?" + queryString;
     }
 }
